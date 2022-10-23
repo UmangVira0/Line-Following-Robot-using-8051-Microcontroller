@@ -1,0 +1,1246 @@
+JULY_4                                                                                                        PAGE 1
+
+                       1                            $MOD51
+                       2                            
+                       3    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                       4                            
+  0030                 5                            COUNTER         EQU             30H
+  0086                 6                            DISPLAY_1               BIT             P0.6
+  0087                 7                            DISPLAY_2               BIT             P0.7
+  0085                 8                            BZR                     BIT             P0.5
+  0097                 9                            SW_UP                   BIT             P1.7
+  0096                10                            SW_DWN          BIT             P1.6    
+  0031                11                            D1                      EQU             COUNTER + 1
+  0032                12                            D2                      EQU             COUNTER + 2
+  0033                13                            D3                      EQU             COUNTER + 3             
+  0034                14                            VAR                     EQU             COUNTER + 4
+  0035                15                            DLY_RES         EQU             COUNTER+5
+  0036                16                            DEST_RES                EQU             COUNTER+6
+  0037                17                            SOURCE_RES              EQU             COUNTER+7
+  0038                18                            PATH_RES                EQU             COUNTER+8
+                      19    
+                      20    
+                      21    
+                      22    
+  0001                23                            F_L                     BIT             01H     ;LOW WHEN BLACK
+  0000                24                            F_R                     BIT             00H
+  0003                25                            M_L                     BIT             03H
+  0002                26                            M_R                     BIT             02H
+  0004                27                            POS_1                   BIT             04H     
+  0005                28                            POS_2                   BIT             05H
+  0006                29                            POS_3                   BIT             06H
+  0008                30                            JUNCTION                BIT             08H     ;High when Stop 
+  00B4                31                            TRACK_STAT              BIT             P3.4    ;HIGH WHEN BLACK    
+                                                                                           
+  00B5                32                            ADD0                    BIT             P3.5
+  00B6                33                            ADD1                    BIT             P3.6
+  00B7                34                            ADD2                    BIT             P3.7    
+                      35    
+                      36    
+  0083                37                            PINK                    BIT             P0.3
+  0082                38                            R_BLU                   BIT             P0.2
+  0084                39                            L_BLU                   BIT             P0.4
+                      40    
+                      41                                    
+                      42    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+0000                  43                            ORG 00H
+0000 758165           44                            MOV SP,#65H
+0003 D2B4             45                            SETB TRACK_STAT
+0005 D2B3             46                            SETB P3.3
+0007 D201             47                            SETB F_L
+0009 D200             48                            SETB F_R
+                      49                            
+                      50                            
+000B 120560           51                            CALL LONG_BEEP
+000E 753005           52                            MOV COUNTER,#05
+0011 C282             53            FLS_NXT:        CLR R_BLU       
+0013 12059D           54                            CALL DLY        
+0016 C283             55                            CLR     PINK
+0018 12059D           56                            CALL DLY
+001B C284             57                            CLR L_BLU       
+JULY_4                                                                                                        PAGE 2
+
+001D 12059D           58                            CALL DLY
+0020 12059D           59                            CALL DLY
+0023 D282             60                            SETB R_BLU      
+0025 D283             61                            SETB PINK
+0027 D284             62                            SETB L_BLU      
+0029 12059D           63                            CALL DLY
+002C 12059D           64                            CALL DLY
+002F D530DF           65                            DJNZ COUNTER,FLS_NXT
+0032 7520FF           66                            MOV 20H,#0FFH
+0035 D282             67                            SETB R_BLU      
+0037 D283             68                            SETB PINK
+0039 D284             69                            SETB L_BLU      
+                      70    
+003B 120558           71                            CALL BEEP
+                      72                    
+                      73                            ;;;;;   S E L E C T  D E S T I N A T I O N ;;;;;;
+                      74    
+003E C286             75                            CLR DISPLAY_1
+0040 D287             76                            SETB DISPLAY_2
+                      77    
+0042 753000           78                            MOV COUNTER,#00H
+0045 12058F           79                            CALL DIS_COUNT
+                      80    
+                      81    
+0048 20971B           82    WAIT:                   JB SW_UP,CHK_DWN
+004B 12059D           83                            CALL DLY
+004E 209715           84                            JB SW_UP,CHK_DWN
+                      85                            
+                      86                    
+0051 0530             87                            INC COUNTER
+0053 12058F           88                            CALL DIS_COUNT
+0056 1205A6           89                            CALL DLY_3
+0059 E530             90                            MOV A,COUNTER
+005B B40706           91                            CJNE A,#07H,NO_7
+005E 753000           92                            MOV COUNTER,#00H
+0061 120558           93                            CALL BEEP                       
+0064 80E2             94    NO_7:                   JMP WAIT
+                      95    
+0066 2096DF           96    CHK_DWN:                JB SW_DWN,WAIT  
+0069 12059D           97                            CALL DLY
+006C 02006F           98                            JMP START_ROBO
+                      99    
+                     100                            ;;;;;   S E L E C T  D E S T I N A T I O N ;;;;;;
+                     101    
+                     102    
+                     103    
+                     104    
+                     105    
+                     106    
+                     107                            ;;;;;   S T A R T   R O B O  ;;;;;;
+                     108    
+006F 853036          109    START_ROBO:     MOV DEST_RES,COUNTER    ;01:07H
+0072 120575          110                            CALL DIS_DEST           ;DISPLAY DEST ON 7 SEGMENT
+                     111    
+0075 120558          112                            CALL BEEP
+0078 3096FD          113                            JNB SW_DWN,$
+                     114    
+007B D2B3            115                            SETB P3.3
+JULY_4                                                                                                        PAGE 3
+
+                     116                            ;;;;;   S T A R T   R O B O  ;;;;;;
+                     117    
+007D C208            118    FIRST_MOVE:     CLR JUNCTION    ;LOW FOR NORMANL OPERATION
+007F 12045A          119                            CALL HIGH_WAY           ;go till white line  or till 2 white
+0082 1203E0          120                            CALL ROAD_CROSS
+0085 120471          121    CHK_POSITION:   CALL POSITION   ;DISPLAY POSITION ON 7 SEGMENT
+0088 1205A6          122                            CALL DLY_3
+008B 1205A6          123                            CALL DLY_3
+008E 120558          124                            CALL BEEP
+0091 020094          125                            JMP MAKE_PATH
+                     126    
+                     127                            
+                     128    
+                     129    
+                     130                    
+                     131                            ;;;   F I N D   T R A C K   N U M B E R  ;;;;;;
+                     132                            ;DEST_RES  1:7          ;06H
+                     133                            ;SOURCE_RES  1:7        ;01H   16H
+0094 E537            134    MAKE_PATH:              MOV A,SOURCE_RES                ;01H
+0096 C4              135                            SWAP A                  ;10H
+0097 4536            136                            ORL A,DEST_RES          ;16H
+0099 F538            137                            MOV PATH_RES,A          ;SAVE 16H IN PATH RES
+                     138    
+009B E537            139                            MOV A,SOURCE_RES                ;01H
+009D B40103          140    MAY_1:          CJNE A,#01H,MAY_2
+00A0 0200CC          141                            JMP TRACK_1
+00A3 B40203          142    MAY_2:          CJNE A,#02H,MAY_3
+00A6 0200FB          143                            JMP TRACK_2
+00A9 B40303          144    MAY_3:          CJNE A,#03H,MAY_4
+00AC 02012A          145                            JMP TRACK_3
+00AF B40403          146    MAY_4:          CJNE A,#04H,MAY_5
+00B2 020159          147                            JMP TRACK_4
+00B5 B40503          148    MAY_5:          CJNE A,#05H,MAY_6
+00B8 020188          149                            JMP TRACK_5
+00BB B40603          150    MAY_6:          CJNE A,#06H,MAY_7
+00BE 0201B7          151                            JMP TRACK_6
+00C1 B40703          152    MAY_7:          CJNE A,#07H,NO_MATCH
+00C4 0201E6          153                            JMP TRACK_7
+                     154    
+                     155    
+00C7                 156    NO_MATCH:
+00C7 120558          157    STAY_BEEP:              CALL BEEP
+00CA 80FB            158                            JMP STAY_BEEP
+                     159    
+                     160    
+                     161                            ;;;   F I N D   DETAIL T R A C K-1   N U M B E R  ;;;;;;
+                     162    
+                     163    
+00CC E538            164    TRACK_1:                MOV A,PATH_RES
+00CE B41103          165    CHK_11:         CJNE A,#11H,CHK_12
+00D1 020217          166                            JMP NO_MOVE
+00D4 B41203          167    CHK_12:         CJNE A,#12H,CHK_13
+00D7 020219          168                            JMP TRACK_12
+00DA B41303          169    CHK_13:         CJNE A,#13H,CHK_14
+00DD 02023D          170                            JMP TRACK_13
+00E0 B41403          171    CHK_14:         CJNE A,#14H,CHK_15
+00E3 020272          172                            JMP TRACK_14
+00E6 B41503          173    CHK_15:         CJNE A,#15H,CHK_16
+JULY_4                                                                                                        PAGE 4
+
+00E9 0202BB          174                            JMP TRACK_15
+00EC B41603          175    CHK_16:         CJNE A,#16H,CHK_17
+00EF 0202ED          176                            JMP TRACK_16
+00F2 B41103          177    CHK_17:         CJNE A,#17,CHK_1_OUT
+00F5 020333          178                            JMP TRACK_17
+                     179                            
+00F8 020215          180    CHK_1_OUT:              JMP EXIT_TRACK
+                     181            
+                     182                            ;;;   F I N D   DETAIL T R A C K-2   N U M B E R  ;;;;;;        
+                     183    
+                     184    
+00FB E538            185    TRACK_2:                MOV A,PATH_RES
+00FD B42103          186    CHK_21:         CJNE A,#21H,CHK_22
+0100 020398          187                            JMP TRACK_21
+0103 B42203          188    CHK_22:         CJNE A,#22H,CHK_23
+0106 020217          189                            JMP NO_MOVE
+0109 B42303          190    CHK_23:         CJNE A,#23H,CHK_24
+010C 020398          191                            JMP TRACK_23
+010F B42403          192    CHK_24:         CJNE A,#24H,CHK_25
+0112 020398          193                            JMP TRACK_24
+0115 B42503          194    CHK_25:         CJNE A,#25H,CHK_26
+0118 020398          195                            JMP TRACK_25
+011B B42603          196    CHK_26:         CJNE A,#26H,CHK_27
+011E 020398          197                            JMP TRACK_26
+0121 B41B03          198    CHK_27:         CJNE A,#27,CHK_2_OUT
+0124 020398          199                            JMP TRACK_27
+                     200                            
+0127 020215          201    CHK_2_OUT:              JMP EXIT_TRACK
+                     202    
+                     203    
+                     204    
+                     205                            ;;;   F I N D   DETAIL T R A C K-3   N U M B E R  ;;;;;;        
+                     206    
+                     207    
+012A E538            208    TRACK_3:                MOV A,PATH_RES
+012C B43103          209    CHK_31:         CJNE A,#31H,CHK_32
+012F 020217          210                            JMP NO_MOVE
+0132 B43203          211    CHK_32:         CJNE A,#32H,CHK_33
+0135 020398          212                            JMP TRACK_32
+0138 B43303          213    CHK_33:         CJNE A,#33H,CHK_34
+013B 020217          214                            JMP NO_MOVE
+013E B43403          215    CHK_34:         CJNE A,#34H,CHK_35
+0141 020398          216                            JMP TRACK_34
+0144 B43503          217    CHK_35:         CJNE A,#35H,CHK_36
+0147 020398          218                            JMP TRACK_35
+014A B43603          219    CHK_36:         CJNE A,#36H,CHK_37
+014D 020398          220                            JMP TRACK_36
+0150 B42503          221    CHK_37:         CJNE A,#37,CHK_3_OUT
+0153 020398          222                            JMP TRACK_37
+                     223                            
+0156 020215          224    CHK_3_OUT:              JMP EXIT_TRACK
+                     225    
+                     226    
+                     227                            ;;;  D O  I T  Y O UR   S E  L F  ;;;
+                     228    
+                     229                            ;;;   F I N D   DETAIL T R A C K-4   N U M B E R  ;;;;;;        
+                     230    
+                     231    
+JULY_4                                                                                                        PAGE 5
+
+0159 E538            232    TRACK_4:                MOV A,PATH_RES
+015B B44103          233    CHK_41:         CJNE A,#41H,CHK_42
+015E 020398          234                            JMP TRACK_41
+0161 B44203          235    CHK_42:         CJNE A,#42H,CHK_43
+0164 020398          236                            JMP TRACK_42
+0167 B44303          237    CHK_43:         CJNE A,#43H,CHK_44
+016A 020398          238                            JMP TRACK_43
+016D B44403          239    CHK_44:         CJNE A,#44H,CHK_45
+0170 020217          240                            JMP NO_MOVE
+0173 B44503          241    CHK_45:         CJNE A,#45H,CHK_46
+0176 020398          242                            JMP TRACK_45
+0179 B44603          243    CHK_46:         CJNE A,#46H,CHK_47
+017C 020398          244                            JMP TRACK_46
+017F B42F03          245    CHK_47:         CJNE A,#47,CHK_4_OUT
+0182 020398          246                            JMP TRACK_47
+                     247                            
+0185 020215          248    CHK_4_OUT:              JMP EXIT_TRACK
+                     249    
+                     250    
+                     251                            ;;;   F I N D   DETAIL T R A C K-5   N U M B E R  ;;;;;;        
+                     252    
+                     253    
+0188 E538            254    TRACK_5:                MOV A,PATH_RES
+018A B45103          255    CHK_51:         CJNE A,#51H,CHK_52
+018D 020398          256                            JMP TRACK_51
+0190 B45203          257    CHK_52:         CJNE A,#52H,CHK_53
+0193 020398          258                            JMP TRACK_52
+0196 B45303          259    CHK_53:         CJNE A,#53H,CHK_54
+0199 020398          260                            JMP TRACK_53
+019C B45403          261    CHK_54:         CJNE A,#54H,CHK_55
+019F 020398          262                            JMP TRACK_54
+01A2 B45503          263    CHK_55:         CJNE A,#55H,CHK_56
+01A5 020217          264                            JMP NO_MOVE
+01A8 B45603          265    CHK_56:         CJNE A,#56H,CHK_57
+01AB 020398          266                            JMP TRACK_56
+01AE B43903          267    CHK_57:         CJNE A,#57,CHK_5_OUT
+01B1 020398          268                            JMP TRACK_57
+                     269                            
+01B4 020215          270    CHK_5_OUT:              JMP EXIT_TRACK
+                     271    
+                     272    
+                     273                            ;;;   F I N D   DETAIL T R A C K-6   N U M B E R  ;;;;;;        
+                     274    
+                     275    
+01B7 E538            276    TRACK_6:                MOV A,PATH_RES
+01B9 B46103          277    CHK_61:         CJNE A,#61H,CHK_62
+01BC 020398          278                            JMP TRACK_61
+01BF B46203          279    CHK_62:         CJNE A,#62H,CHK_63
+01C2 020398          280                            JMP TRACK_62
+01C5 B46303          281    CHK_63:         CJNE A,#63H,CHK_64
+01C8 020398          282                            JMP TRACK_63
+01CB B46403          283    CHK_64:         CJNE A,#64H,CHK_65
+01CE 020398          284                            JMP TRACK_64
+01D1 B46503          285    CHK_65:         CJNE A,#65H,CHK_66
+01D4 020398          286                            JMP TRACK_65
+01D7 B46603          287    CHK_66:         CJNE A,#66H,CHK_67
+01DA 020217          288                            JMP NO_MOVE
+01DD B44303          289    CHK_67:         CJNE A,#67,CHK_6_OUT
+JULY_4                                                                                                        PAGE 6
+
+01E0 020398          290                            JMP TRACK_67
+                     291                            
+01E3 020215          292    CHK_6_OUT:              JMP EXIT_TRACK
+                     293    
+                     294    
+                     295                            ;;;   F I N D   DETAIL T R A C K-7   N U M B E R  ;;;;;;        
+                     296    
+                     297    
+01E6 E538            298    TRACK_7:                MOV A,PATH_RES
+01E8 B47103          299    CHK_71:         CJNE A,#71H,CHK_72
+01EB 020398          300                            JMP TRACK_71
+01EE B47203          301    CHK_72:         CJNE A,#72H,CHK_73
+01F1 020398          302                            JMP TRACK_72
+01F4 B47303          303    CHK_73:         CJNE A,#73H,CHK_74
+01F7 020398          304                            JMP TRACK_73
+01FA B47403          305    CHK_74:         CJNE A,#74H,CHK_75
+01FD 020398          306                            JMP TRACK_74
+0200 B47503          307    CHK_75:         CJNE A,#75H,CHK_76
+0203 020398          308                            JMP TRACK_75
+0206 B47603          309    CHK_76:         CJNE A,#76H,CHK_77
+0209 020398          310                            JMP TRACK_76
+020C B44D03          311    CHK_77:         CJNE A,#77,CHK_7_OUT
+020F 020217          312                            JMP NO_MOVE
+                     313                            
+0212 020215          314    CHK_7_OUT:              JMP EXIT_TRACK
+                     315    
+                     316    
+                     317    
+                     318                            ;;;;;;;;;;;;;;;;;   T R A CK   E N D  ;;;;;;;;;;;
+                     319    
+                     320    
+                     321    
+                     322    
+0215 80FE            323    EXIT_TRACK:     jmp $
+                     324    
+                     325    
+0217 80FE            326    NO_MOVE:                JMP $
+                     327    
+                     328    
+                     329    
+                     330    
+                     331    
+                     332    
+0219 120575          333    TRACK_12:               CALL DIS_DEST
+021C C208            334                            CLR JUNCTION
+021E 12045A          335                            CALL HIGH_WAY
+0221 1203E0          336                            CALL ROAD_CROSS
+0224 120471          337                            CALL POSITION
+0227 1205CC          338                            CALL DLY_POS
+022A 1203A8          339                            CALL LEFT_90
+022D C208            340                            CLR JUNCTION
+022F 12045A          341                            CALL HIGH_WAY
+0232 1203E0          342                            CALL ROAD_CROSS
+0235 1203D0          343                            CALL RIGHT_90
+0238 C208            344                            CLR JUNCTION
+023A 0203D1          345                            JMP  PARKED
+                     346    
+                     347    
+JULY_4                                                                                                        PAGE 7
+
+                     348    
+                     349    
+                     350    
+                     351    
+                     352    
+                     353    
+                     354    
+023D 120575          355    TRACK_13:               CALL DIS_DEST
+0240 C208            356                            CLR JUNCTION
+0242 12045A          357                            CALL HIGH_WAY
+0245 1203E0          358                            CALL ROAD_CROSS
+0248 120471          359                            CALL POSITION
+024B 1205CC          360                            CALL DLY_POS
+024E 120575          361                            CALL DIS_DEST
+0251 C208            362                            CLR JUNCTION
+0253 12045A          363                            CALL HIGH_WAY
+0256 1203E0          364                            CALL ROAD_CROSS
+0259 120471          365                            CALL POSITION
+025C 1205CC          366                            CALL DLY_POS
+025F 1203A8          367                            CALL LEFT_90
+0262 C208            368                            CLR JUNCTION
+0264 12045A          369                            CALL HIGH_WAY
+0267 1203E0          370                            CALL ROAD_CROSS
+026A 1203D0          371                            CALL RIGHT_90
+026D C208            372                            CLR JUNCTION
+026F 0203D1          373                            JMP  PARKED
+                     374    
+                     375    
+                     376    
+                     377    
+0272 120575          378    TRACK_14:               CALL DIS_DEST
+0275 C208            379                            CLR JUNCTION
+0277 12045A          380                            CALL HIGH_WAY
+027A 1203E0          381                            CALL ROAD_CROSS
+027D 120471          382                            CALL POSITION
+0280 1205CC          383                            CALL DLY_POS
+0283 120575          384                            CALL DIS_DEST
+0286 C208            385                            CLR JUNCTION
+0288 12045A          386                            CALL HIGH_WAY
+028B 1203E0          387                            CALL ROAD_CROSS
+028E 120471          388                            CALL POSITION
+0291 1205CC          389                            CALL DLY_POS
+0294 1203D0          390                            CALL RIGHT_90
+0297 C208            391                            CLR JUNCTION
+0299 12045A          392                            CALL HIGH_WAY
+029C 1203E0          393                            CALL ROAD_CROSS
+029F 120471          394                            CALL POSITION
+02A2 1205CC          395                            CALL DLY_POS
+02A5 120575          396                            CALL DIS_DEST
+02A8 1203A8          397                            CALL LEFT_90
+02AB C208            398                            CLR JUNCTION
+02AD 12045A          399                            CALL HIGH_WAY
+02B0 1203E0          400                            CALL ROAD_CROSS
+02B3 1203D0          401                            CALL RIGHT_90
+02B6 C208            402                            CLR JUNCTION
+02B8 0203D1          403                            JMP  PARKED
+                     404    
+                     405    
+JULY_4                                                                                                        PAGE 8
+
+                     406    
+02BB 120575          407    TRACK_15:               CALL DIS_DEST
+02BE C208            408                            CLR JUNCTION
+02C0 12045A          409                            CALL HIGH_WAY
+02C3 1203E0          410                            CALL ROAD_CROSS
+02C6 120471          411                            CALL POSITION
+02C9 1205CC          412                            CALL DLY_POS
+02CC 1203D0          413                            CALL RIGHT_90
+02CF C208            414                            CLR JUNCTION
+02D1 12045A          415                            CALL HIGH_WAY
+02D4 1203E0          416                            CALL ROAD_CROSS
+02D7 120471          417                            CALL POSITION
+02DA 1205CC          418                            CALL DLY_POS
+02DD C208            419                            CLR JUNCTION
+02DF 12045A          420                            CALL HIGH_WAY
+02E2 1203E0          421                            CALL ROAD_CROSS
+02E5 1203D0          422                            CALL RIGHT_90
+02E8 C208            423                            CLR JUNCTION
+02EA 0203D1          424                            JMP  PARKED
+                     425    
+                     426    
+                     427    
+02ED 120575          428    TRACK_16:               CALL DIS_DEST
+02F0 C208            429                            CLR JUNCTION
+02F2 12045A          430                            CALL HIGH_WAY
+02F5 1203E0          431                            CALL ROAD_CROSS
+02F8 120471          432                            CALL POSITION           ;DIS-2
+02FB 1205CC          433                            CALL DLY_POS
+02FE 1203D0          434                            CALL RIGHT_90
+0301 C208            435                            CLR JUNCTION
+0303 12045A          436                            CALL HIGH_WAY
+0306 1203E0          437                            CALL ROAD_CROSS
+0309 120471          438                            CALL POSITION
+030C 1205CC          439                            CALL DLY_POS            ;DIS-5
+030F 1203D0          440                            CALL RIGHT_90
+0312 C208            441                            CLR JUNCTION
+0314 12045A          442                            CALL HIGH_WAY
+0317 1203E0          443                            CALL ROAD_CROSS
+031A 120471          444                            CALL POSITION           ;DIS-6
+031D 1205CC          445                            CALL DLY_POS
+0320 1203A8          446                            CALL LEFT_90
+0323 C208            447                            CLR JUNCTION
+0325 12045A          448                            CALL HIGH_WAY
+0328 1203E0          449                            CALL ROAD_CROSS
+032B 1203D0          450                            CALL RIGHT_90
+032E C208            451                            CLR JUNCTION
+0330 0203D1          452                            JMP  PARKED
+                     453    
+                     454    
+0333 120575          455    TRACK_17:               CALL DIS_DEST
+0336 C208            456                            CLR JUNCTION
+0338 12045A          457                            CALL HIGH_WAY
+033B 1203E0          458                            CALL ROAD_CROSS
+033E 120471          459                            CALL POSITION           ;DIS-1
+0341 1205CC          460                            CALL DLY_POS
+0344 1203D0          461                            CALL RIGHT_90
+0347 C208            462                            CLR JUNCTION
+0349 12045A          463                            CALL HIGH_WAY
+JULY_4                                                                                                        PAGE 9
+
+034C 1203E0          464                            CALL ROAD_CROSS
+034F 120471          465                            CALL POSITION           ;DIS-2
+0352 1205CC          466                            CALL DLY_POS
+0355 1203D0          467                            CALL RIGHT_90
+0358 C208            468                            CLR JUNCTION
+035A 12045A          469                            CALL HIGH_WAY
+035D 1203E0          470                            CALL ROAD_CROSS
+0360 120471          471                            CALL POSITION           ;DIS-6          
+0363 1205CC          472                            CALL DLY_POS
+0366 1203D0          473                            CALL RIGHT_90
+0369 C208            474                            CLR JUNCTION
+036B 12045A          475                            CALL HIGH_WAY
+036E 1203E0          476                            CALL ROAD_CROSS
+0371 120471          477                            CALL POSITION           ;DIS-7/P
+0374 1205CC          478                            CALL DLY_POS    
+0377 1203D0          479                            CALL RIGHT_90
+037A C208            480                            CLR JUNCTION
+037C 12045A          481                            CALL HIGH_WAY
+037F 1203E0          482                            CALL ROAD_CROSS
+0382 120471          483                            CALL POSITION
+0385 1205CC          484                            CALL DLY_POS
+0388 C208            485                            CLR JUNCTION
+038A 12045A          486                            CALL HIGH_WAY
+038D 1203E0          487                            CALL ROAD_CROSS
+0390 1203D0          488                            CALL RIGHT_90
+0393 C208            489                            CLR JUNCTION
+0395 0203D1          490                            JMP  PARKED
+                     491    
+                     492    
+                     493                    ;;   T R A  C K   21  : 27
+                     494    
+0398                 495    TRACK_21:               
+                     496    
+0398                 497    TRACK_23:       
+0398                 498    TRACK_24:       
+                     499    
+0398                 500    TRACK_25:       
+0398                 501    TRACK_26:       
+0398                 502    TRACK_27:       
+                     503    
+                     504                    ;;   T R A  C K   31  : 37
+                     505    
+0398                 506    TRACK_31:               
+                     507    
+0398                 508    TRACK_32:       
+0398                 509    TRACK_34:       
+                     510    
+0398                 511    TRACK_35:       
+0398                 512    TRACK_36:       
+0398                 513    TRACK_37:       
+                     514    
+                     515                            ;;   T R A  C K   41  : 47
+0398                 516    TRACK_41:               
+0398                 517    TRACK_42:
+0398                 518    TRACK_43:       
+                     519            
+                     520    
+0398                 521    TRACK_45:       
+JULY_4                                                                                                        PAGE 10
+
+0398                 522    TRACK_46:       
+0398                 523    TRACK_47:       
+                     524    
+                     525                            ;;   T R A  C K   51  : 57
+0398                 526    TRACK_51:               
+0398                 527    TRACK_52:
+0398                 528    TRACK_53:       
+0398                 529    TRACK_54:       
+0398                 530    TRACK_56:       
+0398                 531    TRACK_57:       
+                     532    
+                     533                            ;;   T R A  C K   61  : 67
+0398                 534    TRACK_61:               
+0398                 535    TRACK_62:
+0398                 536    TRACK_63:       
+0398                 537    TRACK_64:
+0398                 538    TRACK_65:               
+0398                 539    TRACK_67:       
+                     540    
+                     541                            ;;   T R A  C K   71  : 77
+                     542    
+0398                 543    TRACK_71:
+0398                 544    TRACK_72:               
+0398                 545    TRACK_73:       
+0398                 546    TRACK_74:
+0398                 547    TRACK_75:               
+0398                 548    TRACK_76:       
+                     549    
+                     550    
+0398                 551    START:          
+0398 C208            552                            CLR JUNCTION    ;LOW FOR NORMANL OPERATION
+                     553    
+039A 1203E0          554                            CALL ROAD_CROSS
+                     555                            
+039D 120471          556    STAY:                   CALL POSITION
+03A0 80FB            557                            JMP STAY
+                     558    
+                     559    
+                     560    
+                     561    
+                     562                            
+03A2 1203A8          563                            CALL LEFT_90
+                     564                            
+03A5 12045A          565                            CALL HIGH_WAY
+                     566    
+                     567    
+                     568    
+                     569                            ;LOW WHEN BLACK
+03A8                 570    LEFT_90:                
+                     571    
+03A8 120426          572    LEFT_1:         CALL STATUS_F
+03AB 12054F          573                            CALL S_L_T
+03AE 2001F7          574                            JB F_L,LEFT_1   
+03B1 1203D3          575                            CALL  INFORM
+                     576                            
+                     577                            
+03B4 120426          578    LEFT_2:         CALL STATUS_F
+03B7 12054F          579                            CALL S_L_T
+JULY_4                                                                                                        PAGE 11
+
+03BA 3001F7          580                            JNB F_L,LEFT_2
+03BD 1203D3          581                            CALL  INFORM
+                     582    
+03C0 120426          583    LEFT_3:         CALL STATUS_F
+03C3 12054F          584                            CALL S_L_T
+03C6 2001F7          585                            JB F_L,LEFT_3   
+03C9 1203D3          586                            CALL  INFORM
+                     587    
+                     588    
+                     589    
+03CC 120426          590                            CALL STATUS_F
+                     591                            
+03CF 22              592                            RET
+                     593    
+03D0 22              594    RIGHT_90:               RET
+                     595    
+                     596    
+03D1 80FE            597    PARKED:         JMP $
+                     598    
+                     599    
+03D3 120546          600    INFORM:         CALL STOP
+03D6 120558          601                            CALL BEEP
+03D9 75350A          602                            MOV DLY_RES,#10
+03DC 1205B9          603                            CALL DLY_V
+03DF 22              604                            RET
+                     605    
+                     606    
+03E0 120409          607    ROAD_CROSS:     CALL STATUS_M
+03E3 E520            608                            MOV A,20H
+03E5 540C            609                            ANL A,#00001100B                ;XXXXYYXX
+03E7 640C            610                            XRL A,#00001100B                
+03E9 6014            611                            JZ CROSS_DONE
+03EB 120519          612                            CALL FOR        
+03EE 753501          613                            MOV DLY_RES,#01H
+03F1 1205B9          614                            CALL DLY_V
+03F4 120546          615                            CALL STOP
+03F7 753510          616                            MOV DLY_RES,#10H
+03FA 1205B9          617                            CALL DLY_V
+03FD 80E1            618                            JMP ROAD_CROSS
+                     619    
+                     620                            
+03FF 120546          621    CROSS_DONE:     CALL STOP
+0402 120558          622                            CALL BEEP
+0405 120409          623                            CALL STATUS_M
+0408 22              624                            RET
+                     625    
+                     626    
+                     627    
+                     628    
+0409 1204CC          629    STATUS_M:               CALL SELECT_L_M         ;XXXX YXXX
+040C 120598          630                            CALL SDLY
+040F C3              631                            CLR C
+0410 A2B4            632                            MOV C,TRACK_STAT
+0412 B3              633                            CPL     C
+0413 9203            634                            MOV M_L,C
+0415 9283            635                            MOV PINK,C
+                     636    
+0417 1204D3          637                            CALL SELECT_R_M         ;XXXX XYXX
+JULY_4                                                                                                        PAGE 12
+
+041A 120598          638                            CALL SDLY
+041D C3              639                            CLR C
+041E A2B4            640                            MOV C,TRACK_STAT
+0420 B3              641                            CPL     C
+0421 9202            642                            MOV M_R,C
+0423 9282            643                            MOV R_BLU,C
+0425 22              644                            RET
+                     645    
+                     646    
+0426 1204BE          647    STATUS_F:               CALL SELECT_L_F         ;XXXX XXYX
+0429 120598          648                            CALL SDLY
+042C C3              649                            CLR C
+042D A2B4            650                            MOV C,TRACK_STAT
+042F B3              651                            CPL     C
+0430 9201            652                            MOV F_L,C
+0432 9283            653                            MOV PINK,C
+                     654    
+0434 1204C5          655                            CALL SELECT_R_F         ;XXXX XXXY
+0437 120598          656                            CALL SDLY
+043A C3              657                            CLR C
+043B A2B4            658                            MOV C,TRACK_STAT
+043D B3              659                            CPL     C
+043E 9200            660                            MOV F_R,C
+0440 9282            661                            MOV R_BLU,C
+0442 22              662                            RET
+                     663    
+                     664    
+                     665    
+                     666    
+                     667    
+                     668    
+                     669    
+                     670    
+0443 1204A3          671    SHOW_STATUS:    CALL GET_STATUS
+0446 120467          672                            CALL DISP_STATUS
+0449 22              673                            RET
+                     674    
+                     675    
+                     676    
+                     677    
+                     678    
+                     679    
+044A 120522          680    SHOT_BREAK:             CALL REV
+044D 753505          681                            MOV DLY_RES,#05H
+0450 1205B9          682                            CALL DLY_V
+0453 120546          683                            CALL STOP
+0456 120558          684                            CALL BEEP
+0459 22              685                            RET
+                     686    
+045A 1204A3          687    HIGH_WAY:               CALL GET_STATUS 
+045D 120467          688                            CALL DISP_STATUS
+0460 1204F6          689                            CALL FUNCTION
+0463 3008F4          690                            JNB JUNCTION,HIGH_WAY
+0466 22              691                            RET
+                     692    
+                     693    
+                     694    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SUBROUTINES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                     695    
+JULY_4                                                                                                        PAGE 13
+
+                     696                    ;;;; IR SUBROUTINE ;;;;
+                     697    
+0467 C3              698    DISP_STATUS:    CLR C
+0468 A201            699                            MOV C, F_L
+046A 9282            700                            MOV R_BLU, C
+046C A200            701                            MOV C, F_R
+046E 9283            702                            MOV PINK, C
+0470 22              703                            RET
+                     704    
+                     705    
+0471                 706    POSITION:               
+                     707    
+0471 1204E1          708    NO_1:                   CALL SELECT_PS_1                                ;GET 1 POSITION IR S
+                                                                               TATUS
+0474 120598          709                            CALL SDLY
+                     710                            
+0477 A2B4            711                            MOV C,TRACK_STAT
+0479 B3              712                            CPL     C
+047A 9204            713                            MOV POS_1, C
+047C 9282            714                            MOV R_BLU,C
+                     715    
+047E 1204EF          716    NO_2:                   CALL SELECT_PS_2                                ;GET 2 POSITION IR S
+                                                                               TATUS
+0481 120598          717                            CALL SDLY
+0484 A2B4            718                            MOV C,TRACK_STAT
+0486 B3              719                            CPL     C
+0487 9205            720                            MOV POS_2, C
+0489 9283            721                            MOV PINK,C
+                     722    
+048B 1204E8          723    NO_3:                   CALL SELECT_PS_3                                ;GET 3 POSITION IR S
+                                                                               TATUS
+048E 120598          724                            CALL SDLY
+0491 A2B4            725                            MOV C,TRACK_STAT
+0493 B3              726                            CPL     C
+0494 9206            727                            MOV POS_3, C
+0496 9284            728                            MOV L_BLU,C
+                     729    
+                     730    
+0498 E520            731                            MOV A,20H               ;NYYYNNNN
+049A C4              732                            SWAP A          ;NNNNNYYY
+049B 5407            733                            ANL A,#00000111B        ;00000YYY
+049D F537            734                            MOV SOURCE_RES,A        ; SAVE POSITION IN SOURCE_RES
+049F 120582          735                            CALL DIS_SOURCE
+04A2 22              736                            RET
+                     737    
+                     738    
+                     739    
+                     740    
+                     741    
+                     742    
+                     743    
+                     744    
+                     745                            
+                     746    
+04A3 D2B3            747    GET_STATUS:     SETB P3.3
+04A5 1204BE          748                            CALL SELECT_L_F                                 ;GETS L_F AND R_F IR
+                                                                                STATUR
+04A8 120598          749                            CALL SDLY
+JULY_4                                                                                                        PAGE 14
+
+04AB C3              750                            CLR C
+04AC A2B4            751                            MOV C,TRACK_STAT
+                     752                            
+04AE B3              753                            CPL     C
+04AF 9201            754                            MOV F_L,C
+                     755                            ;MOV PINK,C     
+                     756    
+                     757    
+04B1 1204C5          758                            CALL SELECT_R_F
+04B4 120598          759                            CALL SDLY
+04B7 C3              760                            CLR C
+04B8 A2B4            761                            MOV C,TRACK_STAT
+                     762                            
+04BA B3              763                            CPL     C
+04BB 9200            764                            MOV F_R,C
+                     765                            ;MOV BLU,C
+04BD 22              766                            RET
+                     767    
+04BE C2B7            768    SELECT_L_F:     CLR ADD2
+04C0 C2B6            769                            CLR ADD1
+04C2 C2B5            770                            CLR ADD0
+04C4 22              771                            RET
+                     772                            
+04C5 C2B7            773    SELECT_R_F:     CLR ADD2
+04C7 C2B6            774                            CLR ADD1
+04C9 D2B5            775                            SETB ADD0
+04CB 22              776                            RET
+                     777                            
+04CC C2B7            778    SELECT_L_M:     CLR ADD2
+04CE D2B6            779                            SETB ADD1
+04D0 C2B5            780                            CLR ADD0
+04D2 22              781                            RET
+                     782                                                    
+04D3 C2B7            783    SELECT_R_M:     CLR ADD2
+04D5 D2B6            784                            SETB ADD1
+04D7 D2B5            785                            SETB ADD0
+04D9 22              786                            RET
+                     787                                                    
+04DA D2B7            788    SELECT_PS_4:SETB ADD2
+04DC C2B6            789                            CLR ADD1
+04DE C2B5            790                            CLR ADD0
+04E0 22              791                            RET
+                     792                                                    
+04E1 D2B7            793    SELECT_PS_1:SETB ADD2
+04E3 C2B6            794                            CLR ADD1
+04E5 D2B5            795                            SETB ADD0
+04E7 22              796                            RET
+                     797                                                    
+04E8 D2B7            798    SELECT_PS_3:SETB ADD2
+04EA D2B6            799                            SETB ADD1
+04EC C2B5            800                            CLR ADD0
+04EE 22              801                            RET
+                     802                                                    
+04EF D2B7            803    SELECT_PS_2:SETB ADD2
+04F1 D2B6            804                            SETB ADD1
+04F3 D2B5            805                            SETB ADD0
+04F5 22              806                            RET
+                     807                                            
+JULY_4                                                                                                        PAGE 15
+
+                     808                    ;;;; MOTOR SUBROUTINE ;;;;      
+                     809                            
+04F6 E520            810    FUNCTION:       MOV A, 20H                                              ;TO PERFORM FUNCTION
+                                                                                ACC TO IR STATUS
+                     811                            ;MOV A, #00000001B              
+04F8 5403            812                            ANL A, #00000011B
+04FA B40004          813    GO_0:           CJNE A, #00H, GO_1
+04FD 120519          814                            CALL FOR
+0500 22              815                            RET
+0501 B40104          816    GO_1:           CJNE A, #01H, GO_2
+0504 120534          817                            CALL L_L_T
+0507 22              818                            RET
+0508 B40204          819    GO_2:           CJNE A, #02H, GO_3
+050B 12053D          820                            CALL L_R_T
+050E 22              821                            RET
+050F B40306          822    GO_3:                   CJNE A, #03H, GO_OUT
+0512 120546          823                            CALL STOP
+0515 D208            824                            SETB JUNCTION   ;
+0517 22              825                            RET                     
+0518 22              826    GO_OUT:         RET
+                     827    
+                     828    
+0519 C293            829    FOR:                    CLR P1.3
+051B D292            830                            SETB P1.2
+051D D291            831                            SETB P1.1
+051F C290            832                            CLR P1.0
+0521 22              833                            RET
+0522 D293            834    REV:                    SETB P1.3
+0524 C292            835                            CLR P1.2
+0526 C291            836                            CLR P1.1
+0528 D290            837                            SETB P1.0
+052A 22              838                            RET
+                     839    
+052B C290            840    S_R_T:          CLR P1.0
+052D D291            841                            SETB P1.1
+052F C292            842                            CLR P1.2        
+0531 D293            843                            SETB P1.3
+0533 22              844                            RET
+                     845    
+0534 D293            846    L_L_T:          SETB P1.3
+0536 D292            847                            SETB P1.2
+0538 D291            848                            SETB P1.1
+053A C290            849                            CLR P1.0
+053C 22              850                            RET
+                     851    
+053D C293            852    L_R_T:          CLR P1.3
+053F D292            853                            SETB P1.2
+0541 D291            854                            SETB P1.1
+0543 D290            855                            SETB P1.0
+0545 22              856                            RET
+                     857                            
+0546 D293            858    STOP:           SETB P1.3
+0548 D292            859                            SETB P1.2
+054A D291            860                            SETB P1.1
+054C D290            861                            SETB P1.0
+                     862                            ;CALL DLY
+                     863                            ;CALL POS_STATUS
+054E 22              864                            RET
+JULY_4                                                                                                        PAGE 16
+
+                     865            
+                     866    
+                     867                    
+                     868    
+054F D290            869    S_L_T:          SETB P1.0
+0551 C291            870                            CLR P1.1
+0553 D292            871                            SETB P1.2       
+0555 C293            872                            CLR P1.3
+0557 22              873                            RET
+                     874    
+                     875                    ;;;; BUZZER SUBROUTINE ;;;;
+0558 C285            876    BEEP:                   CLR BZR         ; BUZZER ON
+055A 12059D          877                            CALL DLY
+055D D285            878                            SETB BZR        ;BUZZER OFF
+055F 22              879                            RET
+                     880    
+0560 C285            881    LONG_BEEP:              CLR BZR         ; BUZZER ON
+0562 1205D1          882                            CALL LDLY
+0565 1205D1          883                            CALL LDLY
+0568 1205D1          884                            CALL LDLY       
+056B D285            885                            SETB BZR        ;BUZZER OFF
+056D 22              886                            RET
+                     887    
+                     888                    ;;;; 7SEG DISP ;;;;     
+056E 900800          889    DISP:                   MOV DPTR, #TABLE
+0571 93              890                            MOVC A, @A+DPTR
+0572 F5A0            891                            MOV P2, A
+0574 22              892                            RET
+                     893                            
+                     894            
+0575 C286            895    DIS_DEST:               CLR DISPLAY_1   ;ON RIGHT DISPLAY
+0577 D287            896                            SETB DISPLAY_2  ;OFF LEFT DISPLAY
+0579 900800          897                            MOV DPTR,#TABLE
+057C E536            898                            MOV A,DEST_RES
+057E 93              899                            MOVC A,@A+DPTR
+057F F5A0            900                            MOV P2,A
+0581 22              901                            RET     
+                     902    
+                     903    
+0582 C287            904    DIS_SOURCE:     CLR DISPLAY_2   ;ON LEFT DISPLAY
+0584 D286            905                            SETB DISPLAY_1  ;OFF RIGHT DISPLAY
+0586 900800          906                            MOV DPTR,#TABLE
+0589 E537            907                            MOV A,SOURCE_RES
+058B 93              908                            MOVC A,@A+DPTR
+058C F5A0            909                            MOV P2,A
+058E 22              910                            RET
+                     911    
+                     912    
+058F 900800          913    DIS_COUNT:              MOV DPTR,#TABLE
+0592 E530            914                            MOV A,COUNTER
+0594 93              915                            MOVC A,@A+DPTR
+0595 F5A0            916                            MOV P2,A
+0597 22              917                            RET     
+                     918    
+                     919    
+                     920    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;; DELAY LOOP ;;;;;;;;;;;;;;;;;;;;;;;;
+                     921    
+0598 7964            922    SDLY:           MOV R1, #100
+JULY_4                                                                                                        PAGE 17
+
+059A D9FE            923    DL6:            DJNZ R1, DL6
+059C 22              924                            RET
+                     925    
+059D 79FF            926    DLY:            MOV R1, #255
+059F 7AFF            927    DL5:            MOV R2, #255
+05A1 DAFE            928    DL4:            DJNZ R2, DL4
+05A3 D9FA            929                            DJNZ R1, DL5
+05A5 22              930                            RET
+                     931    
+05A6 753105          932    DLY_3:  MOV D1, #05H
+05A9 7532FF          933    DL1:            MOV D2, #0FFH
+05AC 7533FF          934    DL2:            MOV D3, #0FFH
+05AF D533FD          935    DL3:            DJNZ D3, DL3
+05B2 D532F7          936                            DJNZ D2, DL2
+05B5 D531F1          937                            DJNZ D1, DL1
+05B8 22              938                            RET
+                     939    
+05B9 853531          940    DLY_V:  MOV D1, DLY_RES
+05BC 7532C8          941    DLA1:           MOV D2, #200
+05BF 7533C8          942    DLA2:           MOV D3, #200
+05C2 D533FD          943    DLA3:           DJNZ D3, DLA3
+05C5 D532F7          944                            DJNZ D2, DLA2
+05C8 D531F1          945                            DJNZ D1, DLA1
+05CB 22              946                            RET
+                     947    
+                     948    
+                     949    
+                     950    
+                     951    
+05CC B1A6            952    DLY_POS:                CALL DLY_3
+05CE B1A6            953                            CALL DLY_3
+05D0 22              954                            RET
+                     955    
+                     956    
+                     957                    
+05D1 B19D            958    LDLY:                   CALL DLY
+05D3 B19D            959                            CALL DLY
+05D5 B19D            960                            CALL DLY
+05D7 B19D            961                            CALL DLY
+05D9 22              962                            RET             
+                     963                    
+                     964    ;;;;;;;;;;;;;;;;;;;;;;;;;;;; SAVE LOCATION ;;;;;;;;;;;;;;;;;;;;;;
+                     965    
+0800                 966                            ORG 0800H
+0800                 967    TABLE:          ;DB     08H,28H,48H,68H,88H,0A8H,0C8H,0E8H                      
+0800 C0F9A4B0        968                            DB      0C0H,0F9H,0A4H,0B0H,99H,92H,82H,0F8H,80H,90H
+0804 999282F8   
+0808 8090       
+                     969    
+                     970    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                     971                            END
+
+VERSION 1.2h ASSEMBLY COMPLETE, 0 ERRORS FOUND
+JULY_4                                                                                                        PAGE 18
+
+ADD0 . . . . . . . . . . . . . .  B ADDR  00B5H  
+ADD1 . . . . . . . . . . . . . .  B ADDR  00B6H  
+ADD2 . . . . . . . . . . . . . .  B ADDR  00B7H  
+BEEP . . . . . . . . . . . . . .  C ADDR  0558H  
+BZR. . . . . . . . . . . . . . .  B ADDR  0085H  
+CHK_11 . . . . . . . . . . . . .  C ADDR  00CEH  NOT USED  
+CHK_12 . . . . . . . . . . . . .  C ADDR  00D4H  
+CHK_13 . . . . . . . . . . . . .  C ADDR  00DAH  
+CHK_14 . . . . . . . . . . . . .  C ADDR  00E0H  
+CHK_15 . . . . . . . . . . . . .  C ADDR  00E6H  
+CHK_16 . . . . . . . . . . . . .  C ADDR  00ECH  
+CHK_17 . . . . . . . . . . . . .  C ADDR  00F2H  
+CHK_1_OUT. . . . . . . . . . . .  C ADDR  00F8H  
+CHK_21 . . . . . . . . . . . . .  C ADDR  00FDH  NOT USED  
+CHK_22 . . . . . . . . . . . . .  C ADDR  0103H  
+CHK_23 . . . . . . . . . . . . .  C ADDR  0109H  
+CHK_24 . . . . . . . . . . . . .  C ADDR  010FH  
+CHK_25 . . . . . . . . . . . . .  C ADDR  0115H  
+CHK_26 . . . . . . . . . . . . .  C ADDR  011BH  
+CHK_27 . . . . . . . . . . . . .  C ADDR  0121H  
+CHK_2_OUT. . . . . . . . . . . .  C ADDR  0127H  
+CHK_31 . . . . . . . . . . . . .  C ADDR  012CH  NOT USED  
+CHK_32 . . . . . . . . . . . . .  C ADDR  0132H  
+CHK_33 . . . . . . . . . . . . .  C ADDR  0138H  
+CHK_34 . . . . . . . . . . . . .  C ADDR  013EH  
+CHK_35 . . . . . . . . . . . . .  C ADDR  0144H  
+CHK_36 . . . . . . . . . . . . .  C ADDR  014AH  
+CHK_37 . . . . . . . . . . . . .  C ADDR  0150H  
+CHK_3_OUT. . . . . . . . . . . .  C ADDR  0156H  
+CHK_41 . . . . . . . . . . . . .  C ADDR  015BH  NOT USED  
+CHK_42 . . . . . . . . . . . . .  C ADDR  0161H  
+CHK_43 . . . . . . . . . . . . .  C ADDR  0167H  
+CHK_44 . . . . . . . . . . . . .  C ADDR  016DH  
+CHK_45 . . . . . . . . . . . . .  C ADDR  0173H  
+CHK_46 . . . . . . . . . . . . .  C ADDR  0179H  
+CHK_47 . . . . . . . . . . . . .  C ADDR  017FH  
+CHK_4_OUT. . . . . . . . . . . .  C ADDR  0185H  
+CHK_51 . . . . . . . . . . . . .  C ADDR  018AH  NOT USED  
+CHK_52 . . . . . . . . . . . . .  C ADDR  0190H  
+CHK_53 . . . . . . . . . . . . .  C ADDR  0196H  
+CHK_54 . . . . . . . . . . . . .  C ADDR  019CH  
+CHK_55 . . . . . . . . . . . . .  C ADDR  01A2H  
+CHK_56 . . . . . . . . . . . . .  C ADDR  01A8H  
+CHK_57 . . . . . . . . . . . . .  C ADDR  01AEH  
+CHK_5_OUT. . . . . . . . . . . .  C ADDR  01B4H  
+CHK_61 . . . . . . . . . . . . .  C ADDR  01B9H  NOT USED  
+CHK_62 . . . . . . . . . . . . .  C ADDR  01BFH  
+CHK_63 . . . . . . . . . . . . .  C ADDR  01C5H  
+CHK_64 . . . . . . . . . . . . .  C ADDR  01CBH  
+CHK_65 . . . . . . . . . . . . .  C ADDR  01D1H  
+CHK_66 . . . . . . . . . . . . .  C ADDR  01D7H  
+CHK_67 . . . . . . . . . . . . .  C ADDR  01DDH  
+CHK_6_OUT. . . . . . . . . . . .  C ADDR  01E3H  
+CHK_71 . . . . . . . . . . . . .  C ADDR  01E8H  NOT USED  
+CHK_72 . . . . . . . . . . . . .  C ADDR  01EEH  
+CHK_73 . . . . . . . . . . . . .  C ADDR  01F4H  
+CHK_74 . . . . . . . . . . . . .  C ADDR  01FAH  
+CHK_75 . . . . . . . . . . . . .  C ADDR  0200H  
+JULY_4                                                                                                        PAGE 19
+
+CHK_76 . . . . . . . . . . . . .  C ADDR  0206H  
+CHK_77 . . . . . . . . . . . . .  C ADDR  020CH  
+CHK_7_OUT. . . . . . . . . . . .  C ADDR  0212H  
+CHK_DWN. . . . . . . . . . . . .  C ADDR  0066H  
+CHK_POSITION . . . . . . . . . .  C ADDR  0085H  NOT USED  
+COUNTER. . . . . . . . . . . . .    NUMB  0030H  
+CROSS_DONE . . . . . . . . . . .  C ADDR  03FFH  
+D1 . . . . . . . . . . . . . . .    NUMB  0031H  
+D2 . . . . . . . . . . . . . . .    NUMB  0032H  
+D3 . . . . . . . . . . . . . . .    NUMB  0033H  
+DEST_RES . . . . . . . . . . . .    NUMB  0036H  
+DISP . . . . . . . . . . . . . .  C ADDR  056EH  NOT USED  
+DISPLAY_1. . . . . . . . . . . .  B ADDR  0086H  
+DISPLAY_2. . . . . . . . . . . .  B ADDR  0087H  
+DISP_STATUS. . . . . . . . . . .  C ADDR  0467H  
+DIS_COUNT. . . . . . . . . . . .  C ADDR  058FH  
+DIS_DEST . . . . . . . . . . . .  C ADDR  0575H  
+DIS_SOURCE . . . . . . . . . . .  C ADDR  0582H  
+DL1. . . . . . . . . . . . . . .  C ADDR  05A9H  
+DL2. . . . . . . . . . . . . . .  C ADDR  05ACH  
+DL3. . . . . . . . . . . . . . .  C ADDR  05AFH  
+DL4. . . . . . . . . . . . . . .  C ADDR  05A1H  
+DL5. . . . . . . . . . . . . . .  C ADDR  059FH  
+DL6. . . . . . . . . . . . . . .  C ADDR  059AH  
+DLA1 . . . . . . . . . . . . . .  C ADDR  05BCH  
+DLA2 . . . . . . . . . . . . . .  C ADDR  05BFH  
+DLA3 . . . . . . . . . . . . . .  C ADDR  05C2H  
+DLY. . . . . . . . . . . . . . .  C ADDR  059DH  
+DLY_3. . . . . . . . . . . . . .  C ADDR  05A6H  
+DLY_POS. . . . . . . . . . . . .  C ADDR  05CCH  
+DLY_RES. . . . . . . . . . . . .    NUMB  0035H  
+DLY_V. . . . . . . . . . . . . .  C ADDR  05B9H  
+EXIT_TRACK . . . . . . . . . . .  C ADDR  0215H  
+FIRST_MOVE . . . . . . . . . . .  C ADDR  007DH  NOT USED  
+FLS_NXT. . . . . . . . . . . . .  C ADDR  0011H  
+FOR. . . . . . . . . . . . . . .  C ADDR  0519H  
+FUNCTION . . . . . . . . . . . .  C ADDR  04F6H  
+F_L. . . . . . . . . . . . . . .  B ADDR  0001H  
+F_R. . . . . . . . . . . . . . .  B ADDR  0000H  
+GET_STATUS . . . . . . . . . . .  C ADDR  04A3H  
+GO_0 . . . . . . . . . . . . . .  C ADDR  04FAH  NOT USED  
+GO_1 . . . . . . . . . . . . . .  C ADDR  0501H  
+GO_2 . . . . . . . . . . . . . .  C ADDR  0508H  
+GO_3 . . . . . . . . . . . . . .  C ADDR  050FH  
+GO_OUT . . . . . . . . . . . . .  C ADDR  0518H  
+HIGH_WAY . . . . . . . . . . . .  C ADDR  045AH  
+INFORM . . . . . . . . . . . . .  C ADDR  03D3H  
+JUNCTION . . . . . . . . . . . .  B ADDR  0008H  
+LDLY . . . . . . . . . . . . . .  C ADDR  05D1H  
+LEFT_1 . . . . . . . . . . . . .  C ADDR  03A8H  
+LEFT_2 . . . . . . . . . . . . .  C ADDR  03B4H  
+LEFT_3 . . . . . . . . . . . . .  C ADDR  03C0H  
+LEFT_90. . . . . . . . . . . . .  C ADDR  03A8H  
+LONG_BEEP. . . . . . . . . . . .  C ADDR  0560H  
+L_BLU. . . . . . . . . . . . . .  B ADDR  0084H  
+L_L_T. . . . . . . . . . . . . .  C ADDR  0534H  
+L_R_T. . . . . . . . . . . . . .  C ADDR  053DH  
+MAKE_PATH. . . . . . . . . . . .  C ADDR  0094H  
+JULY_4                                                                                                        PAGE 20
+
+MAY_1. . . . . . . . . . . . . .  C ADDR  009DH  NOT USED  
+MAY_2. . . . . . . . . . . . . .  C ADDR  00A3H  
+MAY_3. . . . . . . . . . . . . .  C ADDR  00A9H  
+MAY_4. . . . . . . . . . . . . .  C ADDR  00AFH  
+MAY_5. . . . . . . . . . . . . .  C ADDR  00B5H  
+MAY_6. . . . . . . . . . . . . .  C ADDR  00BBH  
+MAY_7. . . . . . . . . . . . . .  C ADDR  00C1H  
+M_L. . . . . . . . . . . . . . .  B ADDR  0003H  
+M_R. . . . . . . . . . . . . . .  B ADDR  0002H  
+NO_1 . . . . . . . . . . . . . .  C ADDR  0471H  NOT USED  
+NO_2 . . . . . . . . . . . . . .  C ADDR  047EH  NOT USED  
+NO_3 . . . . . . . . . . . . . .  C ADDR  048BH  NOT USED  
+NO_7 . . . . . . . . . . . . . .  C ADDR  0064H  
+NO_MATCH . . . . . . . . . . . .  C ADDR  00C7H  
+NO_MOVE. . . . . . . . . . . . .  C ADDR  0217H  
+P0 . . . . . . . . . . . . . . .  D ADDR  0080H  PREDEFINED  
+P1 . . . . . . . . . . . . . . .  D ADDR  0090H  PREDEFINED  
+P2 . . . . . . . . . . . . . . .  D ADDR  00A0H  PREDEFINED  
+P3 . . . . . . . . . . . . . . .  D ADDR  00B0H  PREDEFINED  
+PARKED . . . . . . . . . . . . .  C ADDR  03D1H  
+PATH_RES . . . . . . . . . . . .    NUMB  0038H  
+PINK . . . . . . . . . . . . . .  B ADDR  0083H  
+POSITION . . . . . . . . . . . .  C ADDR  0471H  
+POS_1. . . . . . . . . . . . . .  B ADDR  0004H  
+POS_2. . . . . . . . . . . . . .  B ADDR  0005H  
+POS_3. . . . . . . . . . . . . .  B ADDR  0006H  
+REV. . . . . . . . . . . . . . .  C ADDR  0522H  
+RIGHT_90 . . . . . . . . . . . .  C ADDR  03D0H  
+ROAD_CROSS . . . . . . . . . . .  C ADDR  03E0H  
+R_BLU. . . . . . . . . . . . . .  B ADDR  0082H  
+SDLY . . . . . . . . . . . . . .  C ADDR  0598H  
+SELECT_L_F . . . . . . . . . . .  C ADDR  04BEH  
+SELECT_L_M . . . . . . . . . . .  C ADDR  04CCH  
+SELECT_PS_1. . . . . . . . . . .  C ADDR  04E1H  
+SELECT_PS_2. . . . . . . . . . .  C ADDR  04EFH  
+SELECT_PS_3. . . . . . . . . . .  C ADDR  04E8H  
+SELECT_PS_4. . . . . . . . . . .  C ADDR  04DAH  NOT USED  
+SELECT_R_F . . . . . . . . . . .  C ADDR  04C5H  
+SELECT_R_M . . . . . . . . . . .  C ADDR  04D3H  
+SHOT_BREAK . . . . . . . . . . .  C ADDR  044AH  NOT USED  
+SHOW_STATUS. . . . . . . . . . .  C ADDR  0443H  NOT USED  
+SOURCE_RES . . . . . . . . . . .    NUMB  0037H  
+SP . . . . . . . . . . . . . . .  D ADDR  0081H  PREDEFINED  
+START. . . . . . . . . . . . . .  C ADDR  0398H  NOT USED  
+START_ROBO . . . . . . . . . . .  C ADDR  006FH  
+STATUS_F . . . . . . . . . . . .  C ADDR  0426H  
+STATUS_M . . . . . . . . . . . .  C ADDR  0409H  
+STAY . . . . . . . . . . . . . .  C ADDR  039DH  
+STAY_BEEP. . . . . . . . . . . .  C ADDR  00C7H  
+STOP . . . . . . . . . . . . . .  C ADDR  0546H  
+SW_DWN . . . . . . . . . . . . .  B ADDR  0096H  
+SW_UP. . . . . . . . . . . . . .  B ADDR  0097H  
+S_L_T. . . . . . . . . . . . . .  C ADDR  054FH  
+S_R_T. . . . . . . . . . . . . .  C ADDR  052BH  NOT USED  
+TABLE. . . . . . . . . . . . . .  C ADDR  0800H  
+TRACK_1. . . . . . . . . . . . .  C ADDR  00CCH  
+TRACK_12 . . . . . . . . . . . .  C ADDR  0219H  
+TRACK_13 . . . . . . . . . . . .  C ADDR  023DH  
+JULY_4                                                                                                        PAGE 21
+
+TRACK_14 . . . . . . . . . . . .  C ADDR  0272H  
+TRACK_15 . . . . . . . . . . . .  C ADDR  02BBH  
+TRACK_16 . . . . . . . . . . . .  C ADDR  02EDH  
+TRACK_17 . . . . . . . . . . . .  C ADDR  0333H  
+TRACK_2. . . . . . . . . . . . .  C ADDR  00FBH  
+TRACK_21 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_23 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_24 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_25 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_26 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_27 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_3. . . . . . . . . . . . .  C ADDR  012AH  
+TRACK_31 . . . . . . . . . . . .  C ADDR  0398H  NOT USED  
+TRACK_32 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_34 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_35 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_36 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_37 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_4. . . . . . . . . . . . .  C ADDR  0159H  
+TRACK_41 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_42 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_43 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_45 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_46 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_47 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_5. . . . . . . . . . . . .  C ADDR  0188H  
+TRACK_51 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_52 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_53 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_54 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_56 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_57 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_6. . . . . . . . . . . . .  C ADDR  01B7H  
+TRACK_61 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_62 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_63 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_64 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_65 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_67 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_7. . . . . . . . . . . . .  C ADDR  01E6H  
+TRACK_71 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_72 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_73 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_74 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_75 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_76 . . . . . . . . . . . .  C ADDR  0398H  
+TRACK_STAT . . . . . . . . . . .  B ADDR  00B4H  
+VAR. . . . . . . . . . . . . . .    NUMB  0034H  NOT USED  
+WAIT . . . . . . . . . . . . . .  C ADDR  0048H  
